@@ -1,0 +1,31 @@
+CC := g++
+
+SOURCE_DIR := src
+OBJ_DIR := obj
+
+_OBJS := main.o
+OBJS := $(patsubst %, $(OBJ_DIR)/%, $(_OBJS))
+
+CFLAGS := -g -Iinclude
+LDFLAGS := -Llib
+
+ifeq ($(OS), Windows_NT) # Enviroment Variables
+	LDFLAGS += -lfreeglut -lglu32 -lopengl32
+	EXECUTABLE := main.exe
+else
+	LDFLAGS += -lGL -lGLU -lglut
+	EXECUTABLE := main
+endif
+
+all: $(EXECUTABLE)
+
+$(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(EXECUTABLE): $(OBJS)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(OBJ_DIR)/*.o $(EXECUTABLE)
