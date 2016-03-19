@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
     // glutDisplayFunc(render1);
     // glutReshapeFunc(reshape1);
     
-    glutDisplayFunc(render2);
-    glutReshapeFunc(reshape2);
+    glutDisplayFunc(render1);
+    glutReshapeFunc(reshape1);
 
     // enter GLUT event processing cycle
     glutMainLoop();

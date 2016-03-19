@@ -8,6 +8,7 @@ OBJS := $(patsubst %, $(OBJ_DIR)/%, $(_OBJS))
 
 CFLAGS := -g -Iinclude
 LDFLAGS := -Llib
+LDFLAGS += -static-libgcc
 
 ifeq ($(OS), Windows_NT) # Enviroment Variables
 	LDFLAGS += -lfreeglut -lglu32 -lopengl32
