@@ -2,9 +2,23 @@
 #include <stdexcept>
 #include <iostream>
 #include <math.h>
+#include <cstdio>
 
 using std::cout;
 using std::endl;
+
+int myAtoi(string str) {
+  if (str.empty()) return 0;
+  int i = 0, sign = 1;
+  while (i + 1 < str.size() && isspace(str[i])) ++i;
+  long res = 0;
+  if (str[i] == '-' || str[i] == '+') sign = 44 - str[i++];
+  while (i < str.size()) {
+    if (isdigit(str[i])) res = 10 * res + str[i++] - '0';
+    else return res * sign;
+  }
+  return res * sign;
+}
 
 GLfloat* normalize(GLfloat v1[3], GLfloat v2[3], GLfloat v3[3]) {
   GLfloat vc1[3],vc2[3];
@@ -93,25 +107,60 @@ void modelReader::offModelReader(ifstream& model) {
 
   for (int i = 0; i < face; ++i) {
     model >> points;
-    GLfloat (*faces)[3] = new GLfloat[points][3];
     glBegin(GL_POLYGON);
     for (int j = 0; j < points; ++j) {
       model >> which;
-      // for (int k = 0; k < 3; ++k)
-      //   faces[j][k] = vertices[which][k];
       glVertex3fv(vertices[which]);
     }
     glEnd();
-    // glBegin(GL_POLYGON);
-    // glNormal3fv(normalize(faces[0], faces[1], faces[2]));
-    // for (int j = 0; j < points; ++j)
-    //   glVertex3fv(faces[j]);
-    // glEnd();
   }
 }
 
 // Reference: http://paulbourke.net/dataformats/ply/
-void modelReader::plyModelReader(ifstream& model) {}
+void modelReader::plyModelReader(ifstream& model) {
+  string s;
+  int vertex = 0, face = 0;
+
+  while (getline(model, s)) {
+    if (s.find("end_header") != -1) break;
+
+    int where;
+    if ((where = s.find("element vertex")) != -1)
+      vertex = myAtoi(s.substr(15));
+    else if ((where = s.find("element face")) != -1)
+      face = myAtoi(s.substr(13));
+  }
+
+  GLfloat (*vertices)[3] = new GLfloat[vertex][3]; 
+
+  // VERTEX
+  GLfloat x = 0, y = 0, z = 0;
+  for (int i = 0; i < vertex; ++i) {
+    model >> x >> y >> z;
+    vertices[i][0] = x;
+    vertices[i][1] = y;
+    vertices[i][2] = z;
+    if (highY < y) highY = y;
+    if (lowY > y) lowY = y;
+    if (highZ < z) highZ = z;
+    if (lowZ > z) lowZ = z;
+  }
+
+  int points = 0, which = 0;
+
+  for (int i = 0; i < 5; ++i) {
+    model >> points;
+    cout << points << " ";
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glBegin(GL_POLYGON);
+    for (int j = 0; j < points; ++j) {
+      model >> which;
+      cout << which << " ";
+      glVertex3fv(vertices[which]);
+    }
+    glEnd();
+  }
+}
 
 // Reference: http://www.fileformat.info/format/wavefrontobj/egff.htm
 void modelReader::objModelReader(ifstream& model) {}
