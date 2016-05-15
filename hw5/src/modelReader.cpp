@@ -14,9 +14,18 @@ int myAtoi(string str) {
   return res * sign;
 }
 
-modelReader::modelReader() : highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {}
+modelReader::modelReader() : highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {
+  rotate = 0;
+  rotate_x = 0;
+  rotate_y = 0;
+  rotate_z = 0;
+  translate_x = 0;
+  translate_y = 0;
+  translate_z = 0;
+}
 
-modelReader::modelReader(string filename) : file("data/" + filename), highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {
+modelReader::modelReader(string filename) : file("data/" + filename) {
+  modelReader();
   int where = file.rfind('.');
   string posfix = file.substr(where + 1);
 
@@ -55,7 +64,6 @@ void modelReader::setStyle(int style) {
   this->style = style;
 }
 
-// Reference : http://shape.cs.princeton.edu/benchmark/documentation/off_format.html
 void modelReader::readModel() {
   ifstream model(this->file.c_str());
 
@@ -81,6 +89,7 @@ void modelReader::readModel() {
   model.close();
 }
 
+// Reference : http://shape.cs.princeton.edu/benchmark/documentation/off_format.html
 void modelReader::offModelReader(ifstream& model) {
   string s;
   int vertex = 0, face = 0, edge = 0;
@@ -205,7 +214,7 @@ void modelReader::drawModel(int style) {
   }
 
   for (vector<Face>::const_iterator iter1 = faces.begin(), end1 = faces.end(); iter1 != end1; iter1++) {
-    glBegin(GL_POLYGON);
+    glBegin(GL_TRIANGLES);
 
     drawNormalize(*iter1);
     for (Face::const_iterator iter2 = (*iter1).begin(), end2 = (*iter1).end(); iter2 != end2; iter2++)
@@ -234,22 +243,26 @@ void modelReader::drawNormalize(Face face) {
   glNormal3f(x / mod, y / mod, z / mod); 
 }
 
-
 GLfloat modelReader::getMaxX() {
   return highX;
 }
+
 GLfloat modelReader::getMaxY() {
   return highY;
 }
+
 GLfloat modelReader::getMaxZ() {
   return highZ;
 }
+
 GLfloat modelReader::getMinX() {
   return lowX;
 }
+
 GLfloat modelReader::getMinY() {
   return lowY;
 }
+
 GLfloat modelReader::getMinZ() {
   return lowZ;
 }

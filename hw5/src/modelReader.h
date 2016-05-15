@@ -63,6 +63,9 @@ class modelReader {
     vector<Point> vertices;
     vector<Face> faces;
 
+    GLfloat translate_x, translate_y, translate_z;
+    int rotate;
+    GLfloat rotate_x, rotate_y, rotate_z;
     GLfloat highX, lowX;
     GLfloat highY, lowY;
     GLfloat highZ, lowZ;

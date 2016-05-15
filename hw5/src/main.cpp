@@ -13,6 +13,12 @@ using std::endl;
 #define HEIGHT 500
 
 modelReader reader;
+GLfloat lastX, lastY;
+GLfloat translate_x = 0, translate_y = 0;
+bool horizontal = true;
+int thetaX = 0, thetaY = 0;
+int rotateX_x = 0.0, rotateX_y = 1.0, rotateX_z = 0.0;
+int rotateY_x = 1.0, rotateY_y = 0.0, rotateY_z = 0.0;
 
 void readModel() {
   string filename = "cow.obj";
@@ -33,6 +39,8 @@ void readModel() {
 }
 
 void setLight() {
+  glEnable(GL_DEPTH_TEST);
+
   GLfloat light_position[] = {1.0f, 2.0f, 3.0f, 0.0f};  
   GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
   GLfloat ambient[] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -55,21 +63,26 @@ void view() {
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(90, WIDTH * 1.0 / HEIGHT, depthZ * 0.5, depthZ * 2);
+  gluPerspective(90, WIDTH * 1.0 / HEIGHT, depthZ * 0.5, depthZ * 5);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(centerX, centerY, depthZ * 1.5, centerX, centerY, centerZ, 0, 1, 0);
+  gluLookAt(centerX, centerY, depthZ * 2, centerX, centerY, centerZ, 0, 1, 0);
 }
 
 void render() {
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   view();
 
-  glColor3f(1.0f, 1.0f, 1.0f);
+  glPushMatrix();
+  glTranslated(translate_x, translate_y, 0.0f);
+  glRotated(thetaX, rotateX_x, rotateX_y, rotateX_z);
+  glRotated(thetaY, rotateY_x, rotateY_y, rotateY_z);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   reader.drawModel();
+  glPopMatrix();
 
   glFlush();
 }
@@ -81,6 +94,50 @@ void reshape(int w, int h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
     view();
+}
+
+void click(int button, int state, int x, int y) {
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    lastX = x;
+    lastY = y;
+  }
+}
+
+void motion(int x, int y) {
+  float vec_x = x - lastX, vec_y = y - lastY;
+  lastX = x;
+  lastY = y;
+  translate_x += (vec_x / WIDTH) * (reader.getMaxX() - reader.getMinX());
+  translate_y += (-vec_y / HEIGHT) * (reader.getMaxY() - reader.getMinY());
+
+  glutPostRedisplay();
+}
+
+void rotate(unsigned char key, int x, int y) {
+  switch(key) {
+    case 'w':
+      thetaY -= 2;
+      horizontal = false;
+      glutPostRedisplay();
+      break;
+    case 's':
+      thetaY += 2;
+      horizontal = false;
+      glutPostRedisplay();
+      break;
+    case 'a':
+      thetaX += 2;
+      horizontal = true;
+      glutPostRedisplay();
+      break;
+    case 'd':
+      thetaX -= 2;
+      horizontal = true;
+      glutPostRedisplay();
+      break;
+    default:
+      break;
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -95,6 +152,10 @@ int main(int argc, char *argv[]) {
     setLight();
     glutDisplayFunc(render);
     glutReshapeFunc(reshape);
+
+    glutMouseFunc(click);
+    glutMotionFunc(motion);
+    glutKeyboardFunc(rotate);
 
     // enter GLUT event processing cycle
     glutMainLoop();
