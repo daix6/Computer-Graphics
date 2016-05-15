@@ -1,8 +1,5 @@
 #include "modelReader.h"
-#include <iostream>
-
-using std::cout;
-using std::endl;
+#include <math.h>
 
 int myAtoi(string str) {
   if (str.empty()) return 0;
@@ -17,7 +14,9 @@ int myAtoi(string str) {
   return res * sign;
 }
 
-modelReader::modelReader(string filename) : file(filename), highY(0xFF), lowY(-0xFF), highZ(0xFF), lowZ(-0xFF) {
+modelReader::modelReader() : highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {}
+
+modelReader::modelReader(string filename) : file("data/" + filename), highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {
   int where = file.rfind('.');
   string posfix = file.substr(where + 1);
 
@@ -34,6 +33,26 @@ modelReader::modelReader(string filename) : file(filename), highY(0xFF), lowY(-0
 modelReader::~modelReader() {
   vertices.clear();
   faces.clear();
+}
+
+void modelReader::setFile(string filename) {
+  this->file = "data/" + filename;
+
+  int where = file.rfind('.');
+  string posfix = file.substr(where + 1);
+
+  if (posfix == "off")
+    mode = OFF;
+  else if (posfix == "ply")
+    mode = PLY;
+  else if (posfix == "obj")
+    mode = OBJ;
+  else
+    throw std::invalid_argument("Wrong file type.");
+}
+
+void modelReader::setStyle(int style) {
+  this->style = style;
 }
 
 // Reference : http://shape.cs.princeton.edu/benchmark/documentation/off_format.html
@@ -117,7 +136,7 @@ void modelReader::plyModelReader(ifstream& model) {
 
   // FACE
   int face_size = 0;
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < face; ++i) {
     model >> face_size;
     
     Face face;
@@ -139,7 +158,7 @@ void modelReader::objModelReader(ifstream& model) {
       model >> x >> y >> z;
       vertices.push_back(Point(x, y, z));
       adjustRange(x, y, z);
-    } else if (tag == "f") {
+    } else if (tag == "f") { // OBJ's face index start from 1
       string s;
       int found, next;
       Face face;
@@ -148,10 +167,10 @@ void modelReader::objModelReader(ifstream& model) {
       while (1) {
         next = s.find_first_of(" ", found + 1);
         if (next == string::npos) {
-          face.push_back(myAtoi(s.substr(found + 1)));
+          face.push_back(myAtoi(s.substr(found + 1)) - 1);
           break;
         }
-        face.push_back(myAtoi(s.substr(found + 1, next - found - 1)));
+        face.push_back(myAtoi(s.substr(found + 1, next - found - 1)) - 1);
         found = next;
       }
       faces.push_back(face);
@@ -160,23 +179,77 @@ void modelReader::objModelReader(ifstream& model) {
 }
 
 void modelReader::adjustRange(GLfloat x, GLfloat y, GLfloat z) {
+  if (highX < x) highX = x;
+  if (lowX > x) lowX = x;
   if (highY < y) highY = y;
   if (lowY > y) lowY = y;
   if (highZ < z) highZ = z;
   if (lowZ > z) lowZ = z;
 }
 
-GLfloat modelReader::getCenter() {
-  return (highY + lowY) / 2;
+void modelReader::drawModel() {
+  drawModel(this->style);
 }
 
-void modelReader::drawModel() {
+void modelReader::drawModel(int style) {
+  switch(style) {
+    case FLAT_LINE:
+      drawModel(FLAT);
+    case WIREFRAME:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      break;
+    case FLAT:
+    default:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+  }
+
   for (vector<Face>::const_iterator iter1 = faces.begin(), end1 = faces.end(); iter1 != end1; iter1++) {
     glBegin(GL_POLYGON);
-    
+
+    drawNormalize(*iter1);
     for (Face::const_iterator iter2 = (*iter1).begin(), end2 = (*iter1).end(); iter2 != end2; iter2++)
-      glVertex3fv(vertices[*iter2 - 1].getPointVector());
+      glVertex3fv(vertices[*iter2].getPointVector());
 
     glEnd();
   }
+}
+
+void modelReader::drawNormalize(Face face) {
+  GLfloat* a = vertices[face[0]].getPointVector();
+  GLfloat* b = vertices[face[1]].getPointVector();
+  GLfloat* c = vertices[face[2]].getPointVector();
+  
+  GLfloat x1 = b[0] - a[0], y1 = b[1] - a[1], z1 = b[2] - a[2];
+  GLfloat x2 = c[0] - a[0], y2 = c[1] - a[1], z2 = c[2] - a[2];
+
+  GLfloat x, y, z;
+  // 叉积
+  x = y1 * z2 - z1 * y2;
+  y = z1 * x2 - x1 * z2;
+  z = x1 * y2 - y1 * x2;
+
+  // Normalize
+  GLfloat mod = sqrt(x * x + y * y + z * z);
+  glNormal3f(x / mod, y / mod, z / mod); 
+}
+
+
+GLfloat modelReader::getMaxX() {
+  return highX;
+}
+GLfloat modelReader::getMaxY() {
+  return highY;
+}
+GLfloat modelReader::getMaxZ() {
+  return highZ;
+}
+GLfloat modelReader::getMinX() {
+  return lowX;
+}
+GLfloat modelReader::getMinY() {
+  return lowY;
+}
+GLfloat modelReader::getMinZ() {
+  return lowZ;
 }

@@ -27,28 +27,43 @@ using std::ifstream;
 #define PLY 1
 #define OBJ 2
 
+#define WIREFRAME 3
+#define FLAT 4
+#define FLAT_LINE 5
+
 typedef vector<int> Face;
 
 class modelReader {
   public:
+    modelReader();
     modelReader(string filename);
     ~modelReader();
+    void setFile(string filename);
+    void setStyle(int style);
+
     void readModel();
-
     void drawModel();
+    void drawModel(int style);
 
-    GLfloat getCenter();
+    GLfloat getMaxX();
+    GLfloat getMaxY();
+    GLfloat getMaxZ();
+    GLfloat getMinX();
+    GLfloat getMinY();
+    GLfloat getMinZ();
   private:
     void offModelReader(ifstream& model);
     void plyModelReader(ifstream& model);
     void objModelReader(ifstream& model);
     void adjustRange(GLfloat x, GLfloat y, GLfloat z);
+    void drawNormalize(Face face);
 
-    int mode;
+    int mode, style;
     string file;
     vector<Point> vertices;
     vector<Face> faces;
 
+    GLfloat highX, lowX;
     GLfloat highY, lowY;
     GLfloat highZ, lowZ;
 };
