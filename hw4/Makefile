@@ -26,11 +26,7 @@ $(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 $(EXECUTABLE): $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
-.PHONY: clean, report
+.PHONY: clean
 
 clean:
 	rm -f $(OBJ_DIR)/*.o $(EXECUTABLE)
-	rm -rf report/*.aux report/*.log report/*.out report/*.toc report/*.gz
-
-report:
-	pdflatex -synctex=1 -quiet -aux-directory=doc/ ./doc/report.tex 

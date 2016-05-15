@@ -14,7 +14,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
-\title{Computer Graphics - HW4}
+\title{Computer Graphics - HW5}
 \author{戴旋\ 13331043}
 
 \begin{document}
@@ -31,10 +31,20 @@
 	.2 include \DTcomment{FreeGlut 头文件}.
 	.2 lib \DTcomment{FreeGlut静态库}.
 	.2 obj \DTcomment{存储中间文件}.
-    .2 results \DTcomment{实验结果的截图}.
-    .3 3-bezier.png \DTcomment{三次贝塞尔曲线}.
+	.2 results \DTcomment{实验结果的截图}.
+		.3 armadillo.png.
+		.3 cactus\_1.png.
+		.3 cactus\_2.png.
+		.3 cl.png.
+		.3 cow\_1.png.
+		.3 cow\_2.png.
+		.3 cow\_3.png.
 	.2 src.
-	.3 main.cpp \DTcomment{源代码}.
+	.3 main.cpp \DTcomment{OpenGL架构}.
+	.3 modelReader.cpp \DTcomment{modelReader 解析.off/.ply/.obj文件格式并绘制模型}.
+	.3 modelReader.h \DTcomment{modelReader 头文件}.
+	.3 Point.cpp \DTcomment{Point 点}.
+	.3 Point.h \DTcomment{Point 头文件}.
 	.2 x64. 
 	.3 freeglut.dll \DTcomment{FreeGlut动态库 x64}.
 	.2 freeglut.dll \DTcomment{FreeGlut动态库 x32}.
@@ -51,14 +61,51 @@
 			\item 在根目录下运行 make 编译生成可执行文件
 		\end{itemize}
 		\item Mac 或 以上方法无效时，请下载\href{http://premake.github.io/index.html}{premake5}，配置好环境变量后，在控制台运行\textbf{premake5 --help}可查看支持的环境。然后在根目录运行\textbf{premake5 xxx}生成相应环境的配置文件。（支持VS，gmake，Xcode）
-    \item Notice: 目前实现的方法只能点击4次，然后生成一个三次贝塞尔曲线以及其控制多边形。
 	\end{enumerate}
-	
+
+	\section{如何使用}
+	\begin{enumerate}
+		\item 在命令行执行\ main\ 即可进入\ OpenGL\ 程序
+		\item 按\ W / A / S / D\ 可实现\textbf{旋转}操作
+		\item 鼠标可拖动物体，实现\textbf{平移}操作
+	\end{enumerate}
+
 	\section{程序运行结果}
 	\begin{figure}[H]
-		\centering
 		% pt = px * 72 / DPI
-		\includegraphics[width=0.6\textwidth]{../results/3-bezier.png}
-		\caption{三次贝塞尔曲线}
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/armadillo.png}
+		\caption{Armadillo.off - FLAT}
 	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cactus_1.png}
+		\caption{cactus.ply - FLAT}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cactus_2.png}
+		\caption{cactus.ply - FLAT - 旋转}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cow_1.png}
+		\caption{cow.obj - FLAT}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cow_2.png}
+		\caption{cactus.ply - WIREFRAMES - 旋转}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cow_3.png}
+		\caption{cow.obj - FLAT LINES - 旋转 + 平移}
+	\end{figure}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.6\textwidth]{../results/cl.png}
+		\caption{控制命令行}
+	\end{figure}
+
 \end{document}

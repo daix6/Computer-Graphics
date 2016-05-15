@@ -204,6 +204,20 @@ void modelReader::drawModel(int style) {
   switch(style) {
     case FLAT_LINE:
       drawModel(FLAT);
+
+      glDisable(GL_LIGHTING);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glColor3f(0.2f, 0.2f, 0.2f);
+      for (vector<Face>::const_iterator iter1 = faces.begin(), end1 = faces.end(); iter1 != end1; iter1++) {
+        glBegin(GL_POLYGON);
+
+        for (Face::const_iterator iter2 = (*iter1).begin(), end2 = (*iter1).end(); iter2 != end2; iter2++)
+          glVertex3fv(vertices[*iter2].getPointVector());
+
+        glEnd();
+      }
+      glEnable(GL_LIGHTING);
+      break;
     case WIREFRAME:
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       break;
@@ -214,7 +228,7 @@ void modelReader::drawModel(int style) {
   }
 
   for (vector<Face>::const_iterator iter1 = faces.begin(), end1 = faces.end(); iter1 != end1; iter1++) {
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_POLYGON);
 
     drawNormalize(*iter1);
     for (Face::const_iterator iter2 = (*iter1).begin(), end2 = (*iter1).end(); iter2 != end2; iter2++)

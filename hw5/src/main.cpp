@@ -17,8 +17,8 @@ GLfloat lastX, lastY;
 GLfloat translate_x = 0, translate_y = 0;
 bool horizontal = true;
 int thetaX = 0, thetaY = 0;
-int rotateX_x = 0.0, rotateX_y = 1.0, rotateX_z = 0.0;
-int rotateY_x = 1.0, rotateY_y = 0.0, rotateY_z = 0.0;
+float rotateX_x = 0.0, rotateX_y = 1.0, rotateX_z = 0.0;
+float rotateY_x = 1.0, rotateY_y = 0.0, rotateY_z = 0.0;
 
 void readModel() {
   string filename = "cow.obj";
@@ -39,6 +39,7 @@ void readModel() {
 }
 
 void setLight() {
+  glEnable(GL_LINE_SMOOTH);
   glEnable(GL_DEPTH_TEST);
 
   GLfloat light_position[] = {1.0f, 2.0f, 3.0f, 0.0f};  
@@ -59,15 +60,15 @@ void view() {
   float centerX = (reader.getMaxX() + reader.getMinX()) / 2;
   float centerY = (reader.getMaxY() + reader.getMinY()) / 2;
   float centerZ = (reader.getMaxZ() + reader.getMinZ()) / 2;
-  float depthZ = (reader.getMaxZ() - reader.getMinZ());
+  float depthY = (reader.getMaxY() - reader.getMinY());
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(90, WIDTH * 1.0 / HEIGHT, depthZ * 0.5, depthZ * 5);
+  gluPerspective(90, WIDTH * 1.0 / HEIGHT, depthY * 0.5, depthY * 5);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(centerX, centerY, depthZ * 2, centerX, centerY, centerZ, 0, 1, 0);
+  gluLookAt(centerX, centerY, depthY, centerX, centerY, centerZ, 0, 1, 0);
 }
 
 void render() {
@@ -126,12 +127,12 @@ void rotate(unsigned char key, int x, int y) {
       glutPostRedisplay();
       break;
     case 'a':
-      thetaX += 2;
+      thetaX -= 2;
       horizontal = true;
       glutPostRedisplay();
       break;
     case 'd':
-      thetaX -= 2;
+      thetaX += 2;
       horizontal = true;
       glutPostRedisplay();
       break;
