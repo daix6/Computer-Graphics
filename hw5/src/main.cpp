@@ -1,14 +1,16 @@
-#ifndef DATAREADER_H
-#define DATAREADER_H
+#ifndef MODELREADER_H
+#define MODELREADER_H
 #include "modelReader.h"
 #endif
 
-#define WIDTH 1000
+#define WIDTH 500
 #define HEIGHT 500
 
-modelReader reader("data/cactus.ply");
+modelReader reader("data/Armadillo.off");
 
 void init() {
+  reader.readModel();
+
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   // glShadeModel(GL_SMOOTH);
   
@@ -39,7 +41,7 @@ void render() {
   //gluLookAt(0, 30, 120, 0, 30, 0, 0, 1, 0);
 
   glColor3f(1.0f, 1.0f, 1.0f);
-  reader.handleModel();
+  reader.drawModel();
 
   glFlush();
 }

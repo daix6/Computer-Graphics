@@ -3,7 +3,7 @@ CC := g++
 SOURCE_DIR := src
 OBJ_DIR := obj
 
-_OBJS := main.o modelReader.o
+_OBJS := main.o modelReader.o Point.o
 OBJS := $(patsubst %, $(OBJ_DIR)/%, $(_OBJS))
 
 CFLAGS := -g -Iinclude
