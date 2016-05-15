@@ -14,15 +14,7 @@ int myAtoi(string str) {
   return res * sign;
 }
 
-modelReader::modelReader() : highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {
-  rotate = 0;
-  rotate_x = 0;
-  rotate_y = 0;
-  rotate_z = 0;
-  translate_x = 0;
-  translate_y = 0;
-  translate_z = 0;
-}
+modelReader::modelReader() : highX(-0xFF), lowX(0xff), highY(-0xFF), lowY(0xFF), highZ(-0xFF), lowZ(0xFF) {}
 
 modelReader::modelReader(string filename) : file("data/" + filename) {
   modelReader();
@@ -217,6 +209,7 @@ void modelReader::drawModel(int style) {
         glEnd();
       }
       glEnable(GL_LIGHTING);
+
       break;
     case WIREFRAME:
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
